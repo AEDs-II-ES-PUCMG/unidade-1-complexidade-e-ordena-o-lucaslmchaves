@@ -1,12 +1,12 @@
 import java.util.Arrays;
 
-public class InsertionSort<T extends Comparable<T>> implements IOrdenador<T> {
+public class SelectionSort<T extends Comparable<T>> implements IOrdenador<T> {
     private long comparacoes;
     private long movimentacoes;
     private double tempoOrdenacao;
     private double inicio;
 
-    private double nanoToMilli = 1.0/1_000_000;
+    private double nanoToMilli = 1.0 / 1_000_000;
 
     @Override
     public long getComparacoes() {
@@ -23,22 +23,21 @@ public class InsertionSort<T extends Comparable<T>> implements IOrdenador<T> {
         return tempoOrdenacao;
     }
 
-    private void iniciar(){
+    private void iniciar() {
         this.comparacoes = 0;
         this.movimentacoes = 0;
         this.inicio = System.nanoTime();
     }
 
-    private void terminar(){
+    private void terminar() {
         this.tempoOrdenacao = (System.nanoTime() - this.inicio) * nanoToMilli;
     }
-    
-    @SuppressWarnings("unused")
+
     private void swap(int x, int y, T[] vetor) {
         T temp = vetor[x];
         vetor[x] = vetor[y];
         vetor[y] = temp;
-        movimentacoes+=3;
+        this.movimentacoes += 3;
     }
 
     @Override
@@ -46,17 +45,19 @@ public class InsertionSort<T extends Comparable<T>> implements IOrdenador<T> {
         T[] dadosOrdenados = Arrays.copyOf(dados, dados.length);
         int tamanho = dadosOrdenados.length;
         iniciar();
-        for (int i = 1; i < tamanho; i++) {
-            T temp = dadosOrdenados[i];
-            int j = i - 1;
-            while (j >= 0 && dadosOrdenados[j].compareTo(temp) > 0) {
-                dadosOrdenados[j+1] = dadosOrdenados[j];
-                j--;
+        
+        for (int i = 0; i < tamanho - 1; i++) {
+            int menor = i;
+            for (int j = i + 1; j < tamanho; j++) {
                 this.comparacoes++;
-                this.movimentacoes++;            
+                if (dadosOrdenados[j].compareTo(dadosOrdenados[menor]) < 0) {
+                    menor = j;
+                }
             }
-            dadosOrdenados[j+1] = temp;
-        }	
+            if (menor != i) {
+                swap(i, menor, dadosOrdenados);
+            }
+        }
         terminar();
         return dadosOrdenados;
     }

@@ -41,18 +41,52 @@ public class App {
         int tam = 20;
         Integer[] vetor = gerarVetorObjetos(tam);
 
-        BubbleSort<Integer> bolha = new BubbleSort<>();
+        System.out.println("Vetor Original (desordenado):");
+        System.out.println(Arrays.toString(vetor));
 
+        BubbleSort<Integer> bolha = new BubbleSort<>();
         Integer[] vetorOrdenadoBolha = bolha.ordenar(vetor);
 
         System.out.println("\nVetor ordenado método Bolha:");
+        System.out.println(Arrays.toString(vetorOrdenadoBolha));
         System.out.println("Comparações: " + bolha.getComparacoes());
         System.out.println("Movimentações: " + bolha.getMovimentacoes());
         System.out.println("Tempo de ordenação (ms): " + bolha.getTempoOrdenacao());
 
-        /* TO DO
-        *Fazer a implementacao do restante do main para a ordenacao 
-        *  com os algoritmos InsertionSort e SelectionSort
-        */
+        InsertionSort<Integer> insercao = new InsertionSort<>();
+        Integer[] vetorOrdenadoInsercao = insercao.ordenar(vetor);
+
+        System.out.println("\nVetor ordenado método InsertionSort:");
+        System.out.println(Arrays.toString(vetorOrdenadoInsercao));
+        System.out.println("Comparações: " + insercao.getComparacoes());
+        System.out.println("Movimentações: " + insercao.getMovimentacoes());
+        System.out.println("Tempo de ordenação (ms): " + insercao.getTempoOrdenacao());
+
+        SelectionSort<Integer> selecao = new SelectionSort<>();
+        Integer[] vetorOrdenadoSelecao = selecao.ordenar(vetor);
+
+        System.out.println("\nVetor ordenado método SelectionSort:");
+        System.out.println(Arrays.toString(vetorOrdenadoSelecao));
+        System.out.println("Comparações: " + selecao.getComparacoes());
+        System.out.println("Movimentações: " + selecao.getMovimentacoes());
+        System.out.println("Tempo de ordenação (ms): " + selecao.getTempoOrdenacao());
+
+        System.out.println("\n=======================================================");
+        System.out.println("COMPARATIVO DE DESEMPENHO - VARIANDO TAMANHO DO VETOR");
+        System.out.println("=======================================================");
+        
+        for (int t : tamanhosTesteMedio) {
+            System.out.println("\nTestando vetor de tamanho: " + t);
+            Integer[] vetorMedio = gerarVetorObjetos(t);
+            
+            bolha.ordenar(vetorMedio);
+            System.out.printf("BubbleSort    -> Comparações: %12d | Movimentações: %12d | Tempo: %8.2f ms%n", bolha.getComparacoes(), bolha.getMovimentacoes(), bolha.getTempoOrdenacao());
+            
+            insercao.ordenar(vetorMedio);
+            System.out.printf("InsertionSort -> Comparações: %12d | Movimentações: %12d | Tempo: %8.2f ms%n", insercao.getComparacoes(), insercao.getMovimentacoes(), insercao.getTempoOrdenacao());
+            
+            selecao.ordenar(vetorMedio);
+            System.out.printf("SelectionSort -> Comparações: %12d | Movimentações: %12d | Tempo: %8.2f ms%n", selecao.getComparacoes(), selecao.getMovimentacoes(), selecao.getTempoOrdenacao());
+        }
     }
 }
