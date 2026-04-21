@@ -1,96 +1,141 @@
-import java.util.Arrays;
+import java.util.Comparator;
 
-public class MergeSort<T extends Comparable<T>> implements IOrdenador<T> {
+public class Mergesort<T extends Comparable<T>> implements IOrdenator<T> {
 
-    private long comparacoes;
-    private long movimentacoes;
-    private double tempoOrdenacao;
-    private double inicio;
+	private T[] dadosOrdenados;
+	private Comparator<T> comparador;
+	private long comparacoes;
+	private long movimentacoes;
+	private long inicio;
+	private long termino;
+	
+	public Mergesort() {
+		
+		comparacoes = 0;
+		movimentacoes = 0;
+		setComparador(T::compareTo);
+	}
+	
+	public Mergesort(Comparator<T> comparador) {
+		
+		comparacoes = 0;
+		movimentacoes = 0;
+		setComparador(comparador);
+	}
+	
+	@Override
+	public void setComparador(Comparator<T> comparador) {
+		this.comparador = comparador;
+	}
 
-    private double nanoToMilli = 1.0 / 1_000_000;
+	@Override
+	public T[] ordenar(T[] dados) {
+	
+		dadosOrdenados = dados;
+		
+		comparacoes = 0;
+		movimentacoes = 0;
+		iniciar();
+		
+		mergesort(0, dadosOrdenados.length - 1);
+		
+		terminar();
+		
+		return dadosOrdenados;
+	}
+	
+	/**
+	* Algoritmo de ordenação Mergesort.
+	* @param int esq: início do vetor a ser ordenado
+	* @param int dir: fim do vetor a ser ordenado
+	*/
+	// 1.a chamada do método mergesort: esq: 0; dir: dadosOrdenados.length - 1
+	private void mergesort(int esq, int dir) {
+		
+		if (esq < dir) {
+			int meio = (esq + dir) / 2;
+	        mergesort(esq, meio);
+	        mergesort(meio + 1, dir);
+	        intercalar(esq, meio, dir);
+	    }
+	}
 
-    @Override
-    public long getComparacoes() {
-        return comparacoes;
-    }
+	/**
+	* Algoritmo que intercala os elementos localizados entre as posições esq e dir
+	* @param int esq: início do vetor a ser ordenado
+	* @param int meio: posição do meio do vetor a ser ordenado
+	* @param int dir: fim do vetor a ser ordenado
+	*/ 
+	private void intercalar(int esq, int meio, int dir) {
 
-    @Override
-    public long getMovimentacoes() {
-        return movimentacoes;
-    }
+		int n1, n2, i, j, k;
 
-    @Override
-    public double getTempoOrdenacao() {
-        return tempoOrdenacao;
-    }
+	    //Definir tamanho dos dois subvetores
+	    n1 = meio - esq + 1;
+	    n2 = dir - meio;
 
-    private void iniciar() {
-        this.comparacoes = 0;
-        this.movimentacoes = 0;
-        this.inicio = System.nanoTime();
-    }
+	    @SuppressWarnings("unchecked")
+		T[] a1 = (T[]) new Comparable[n1];
+	      	
+		@SuppressWarnings("unchecked")
+		T[] a2 = (T[]) new Comparable[n2];
 
-    private void terminar() {
-        this.tempoOrdenacao = (System.nanoTime() - this.inicio) * nanoToMilli;
-    }
+	    //Inicializar primeiro subvetor
+	    for (i = 0; i < n1; i++) {
+	    	a1[i] = dadosOrdenados[esq + i];
+	    }
 
-    @Override
-    public T[] ordenar(T[] dados) {
-        T[] dadosOrdenados = Arrays.copyOf(dados, dados.length);
-        iniciar();
-        mergesort(dadosOrdenados, 0, dadosOrdenados.length - 1);
-        terminar();
-        return dadosOrdenados;
-    }
+	    //Inicializar segundo subvetor
+	    for (j = 0; j < n2; j++) {
+	    	a2[j] = dadosOrdenados[meio + 1 + j];
+	    }
 
-    private void mergesort(T[] vetor, int esquerda, int direita) {
-        if (esquerda < direita) {
-            int meio = (esquerda + direita) / 2;
-            mergesort(vetor, esquerda, meio);
-            mergesort(vetor, meio + 1, direita);
-            intercalar(vetor, esquerda, meio, direita);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void intercalar(T[] vetor, int esquerda, int meio, int direita) {
-        int tamanho = direita - esquerda + 1;
-        T[] temp = (T[]) new Comparable[tamanho];
-
-        int i = esquerda;
-        int j = meio + 1;
-        int k = 0;
-
-        while (i <= meio && j <= direita) {
-            this.comparacoes++;
-            if (vetor[i].compareTo(vetor[j]) <= 0) {
-                temp[k] = vetor[i];
-                i++;
-            } else {
-                temp[k] = vetor[j];
-                j++;
-            }
-            this.movimentacoes++;
-            k++;
-        }
-
-        while (i <= meio) {
-            temp[k] = vetor[i];
-            this.movimentacoes++;
-            i++;
-            k++;
-        }
-
-        while (j <= direita) {
-            temp[k] = vetor[j];
-            this.movimentacoes++;
-            j++;
-            k++;
-        }
-
-        for (k = 0; k < tamanho; k++) {
-            vetor[esquerda + k] = temp[k];
-            this.movimentacoes++;
-        }
-    }
+		//Intercalação propriamente dita
+	    for (i = j = 0, k = esq; (i < n1 && j < n2); k++) {
+	    	comparacoes++;
+	      	movimentacoes++;
+	        if (comparador.compare(a1[i], a2[j]) < 0)
+	        	dadosOrdenados[k] = a1[i++];
+	        else
+	        	dadosOrdenados[k] = a2[j++];
+	    }
+		
+		if (i == n1)
+			for (; k <= dir; k++) {
+				movimentacoes++;
+        		dadosOrdenados[k] = a2[j++];
+		    }
+		else
+		    for (; k <= dir; k++) {
+		    	movimentacoes++;
+	        	dadosOrdenados[k] = a1[i++];
+		    }
+	}   
+	
+	@Override
+	public long getComparacoes() {
+		return comparacoes;
+	}
+	
+	@Override
+	public long getMovimentacoes() {
+		return movimentacoes;
+	}
+	
+	private void iniciar() {
+		inicio = System.nanoTime();
+	}
+	
+	private void terminar() {
+		termino = System.nanoTime();
+	}
+	
+	@Override
+	public double getTempoOrdenacao() {
+		
+		double tempoTotal;
+		
+	    tempoTotal = (termino - inicio) / 1_000_000;
+	    return tempoTotal;
+	}
 }
